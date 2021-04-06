@@ -6,7 +6,7 @@ async function listContacts(req, res, next) {
     const contact = await contactModel.find();
     return res.status(201).json(contact);
   } catch (err) {
-    res.status(404).send(err);
+    res.status(500).json({ error: err.message });
   }
 }
 
@@ -16,12 +16,12 @@ async function findContacts(req, res, next) {
   } = req;
   try {
     const contact = await contactModel.findById(contactId);
-    if (contact.length === 0) {
-      return res.status(404).send({ message: "Not found" });
+    if (contact === null || contact.length === 0) {
+      res.status(404).json({ message: "Not found" });
     }
     res.status(200).send(contact);
   } catch (err) {
-    next(err);
+    res.status(500).json({ error: err.message });
   }
 }
 
@@ -35,7 +35,7 @@ async function addContacts(req, res, next) {
     const contact = await contactModel.create(req.body);
     return res.status(201).json(contact);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).json({ error: err.message });
   }
 }
 
@@ -50,13 +50,12 @@ async function deleteContacts(req, res, next) {
     }
     res.status(404).json({ message: "Not found" });
   } catch (err) {
-    next(err);
+    res.status(500).json({ error: err.message });
   }
 }
 
 async function patchContact(req, res, next) {
   const { contactId } = req.params;
-
   try {
     const contact = await contactModel.findByIdAndUpdate(
       contactId,
@@ -68,11 +67,11 @@ async function patchContact(req, res, next) {
       }
     );
     if (!contact) {
-      res.status(404).send({ message: "Not found" });
+      res.status(404).json({ message: "Not found" });
     }
     res.status(200).json(contact);
   } catch (err) {
-    next(err);
+    res.status(500).json({ error: err.message });
   }
 }
 
