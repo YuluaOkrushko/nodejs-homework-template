@@ -1,23 +1,37 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const mongoose = require("mongoose");
 const router = require("./contacts/contacts.routes.js");
-require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 
 const PORT = process.env.PORT || 8080;
+const MONGO_DB_URL = `mongodb+srv://yulua_okrushko:${process.env.DB_PASSWORD}@cluster0.azzgk.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 class Server {
   constructor() {
     this.server = null;
   }
   start() {
-    this.initServer();
+    this.connectDB();
     this.initMiddleware();
     this.initRouters();
     this.startListening();
   }
-  initServer() {
-    this.server = express();
+
+  async connectDB() {
+    try {
+      this.server = express();
+      await mongoose.connect(MONGO_DB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log("Database connecting successful");
+    } catch (err) {
+      console.log(err.message);
+      process.exit(1);
+    }
   }
 
   initMiddleware() {
