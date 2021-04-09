@@ -2,11 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const router = require("./contacts/contacts.routes.js");
+const contactRouter = require("./contacts/contacts.routes.js");
+const userAuthRouter = require("./auth/user.routes.js");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 const MONGO_DB_URL = `mongodb+srv://yulua_okrushko:${process.env.DB_PASSWORD}@cluster0.azzgk.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 class Server {
@@ -41,7 +42,8 @@ class Server {
   }
 
   initRouters() {
-    this.server.use("/api/contacts", router);
+    this.server.use("/api/contacts", contactRouter);
+    this.server.use("/api/auth", userAuthRouter);
   }
 
   startListening() {
