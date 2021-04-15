@@ -2,6 +2,7 @@ const bcrypjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("./user.model.js");
 const { userValidation } = require("./user.validation.js");
+const { generateAvatar } = require("../auxiliaries/avatarGenerator.js");
 require("dotenv").config();
 
 class userController {
@@ -35,6 +36,7 @@ class userController {
         user: {
           email: user.email,
           subscription: user.subscription,
+          avatarURL: await generateAvatar(),
         },
       });
     } catch (err) {
