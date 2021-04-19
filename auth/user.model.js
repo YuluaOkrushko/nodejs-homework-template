@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const uuid = require("uuid");
 
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -11,6 +12,7 @@ const userSchema = new Schema({
     default: "free",
   },
   token: { type: String },
+  verificationToken: { type: String, required: false },
 });
 
 userSchema.statics.findUserByIdAndUpdate = findUserByIdAndUpdate;

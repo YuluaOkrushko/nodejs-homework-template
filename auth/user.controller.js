@@ -3,7 +3,11 @@ const jwt = require("jsonwebtoken");
 const userModel = require("./user.model.js");
 const { userValidation } = require("./user.validation.js");
 const { generateAvatar } = require("../auxiliaries/avatarGenerator.js");
-require("dotenv").config();
+const uuid = require("uuid");
+const dotenv = require("dotenv");
+const { mailSender } = require("../auxiliaries/sendMail.js");
+
+dotenv.config();
 
 class userController {
   constructor() {
@@ -31,12 +35,17 @@ class userController {
         email,
         password: passwordHash,
         subscription,
+        avatarURL: await generateAvatar(),
+        verificationToken: uuid.v4(),
       });
+
+      await this.sendVerificationEmail(user);
+
       return res.status(201).json({
         user: {
           email: user.email,
           subscription: user.subscription,
-          avatarURL: await generateAvatar(),
+          avatarURL: user.avatarURL,
         },
       });
     } catch (err) {
@@ -70,6 +79,7 @@ class userController {
         }
       );
       await userModel.updateToken(user._id, newToken);
+
       res.status(200).json({
         token: newToken,
         user: {
@@ -116,12 +126,34 @@ class userController {
       if (!user || user.token !== token) {
         res.status(401).json("Not authorized");
       }
+
       req.user = user;
       req.token = token;
+
       next();
     } catch (err) {
       next(err);
     }
+  }
+
+  async sendVerificationEmail(user) {
+    const { email, verificationToken } = user;
+    const verificationLink = `http://localhost:${process.env.PORT}/api/auth/verify/${verificationToken}`;
+    await mailSender.sendVerificationEmail(email, verificationLink);
+  }
+
+  async verifyUser(req, res, next) {
+    const { verificationToken } = req.params;
+    const user = await userModel.findOneAndUpdate(
+      { verificationToken },
+      {
+        verificationToken: null,
+      }
+    );
+    if (!user) {
+      return res.status(404).json("User not found");
+    }
+    return res.status(200).json();
   }
 }
 
