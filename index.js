@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const usersRouter = require("./users/users.routes.js");
 const userAuthRouter = require("./auth/user.routes.js");
 const dotenv = require("dotenv");
+
 dotenv.config();
 
 const PORT = process.env.PORT;
