@@ -8,7 +8,7 @@ class MailSender {
     this.transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "yuluadmitrieva94@gmail.com",
+        user: process.env.MY_MAIL,
         pass: process.env.DB_PASSWORD,
       },
     });
@@ -16,8 +16,8 @@ class MailSender {
 
   async sendVerificationEmail(verificationLink) {
     return this.transporter.sendMail({
-      to: "yuluadmitrieva94@gmail.com",
-      from: "yuluadmitrieva94@gmail.com",
+      to: process.env.USER_EMAIL,
+      from: process.env.MY_MAIL,
       subject: "Please, verify your email",
       html: `<a href="${verificationLink}">Click here for verify your account</a>`,
     });
